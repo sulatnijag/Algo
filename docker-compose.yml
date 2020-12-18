@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  fxDB:
+    image: postgres
+    volumes:
+      - "/home/pi/GITRepos/DockerData/fxDB:/var/lib/postgresql/data"
+    ports:
+      - "5432:5432"
+    environment:
+      - "POSTGRES_PASSWORD=abcd1234"
+
+  pgAdmin:
+    image: naobana/pgadmin4:latest
+    volumes:
+      - "/home/pi/GITRepos/DockerData/pgAdmin:/pgadmin"
+    ports:
+      - "5050:5050"
+    
+  Algo:
+    build: .
+    image: algo
+    stdin_open: true
+    tty: true
+    volumes: 
+      - "/home/pi/GITRepos/Algo/FXDataCollector:/usr/src/app/FXDataCollector"
+
+
+  
