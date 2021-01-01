@@ -53,8 +53,6 @@ class FXdb:
 
 
         try:
-
-            
             cur = self.conn.cursor()
             cur.execute(sql,price)
             self.conn.commit()
@@ -78,27 +76,24 @@ class TickListeners:
     # A simple function acting as a Subscription listener
     def on_prices_update(self, item_update):
         #print("price: %s - " % item_update, **item_update["values"])
-        item = item_update["values"]
-
-        time_utc = None
-
-        if item["UTM"] is not None:
-            time_utc = datetime.datetime.utcfromtimestamp(int(item["UTM"])/ 1000)
-
-        print("%s %s    BID=%s    OFR=%s " % (time_utc, item_update["name"], item["BID"], item["OFR"]) )
         
-        
-        price = (item_update["name"], item["UTM"], item["BID"], item["OFR"], time_utc)
-        
-        self.fx_db.insert_fx_price(price)
-        
+        try:
+            item = item_update["values"]
+            time_utc = None
+            
+            if item["UTM"] is not None:
+                time_utc = datetime.datetime.utcfromtimestamp(int(item["UTM"])/ 1000)
+            
+            price = (item_update["name"], item["UTM"], item["BID"], item["OFR"], time_utc)
+            
+            self.fx_db.insert_fx_price(price)
 
-        # print(
-        #     "{stock_name:<19}: Time {UPDATE_TIME:<8} - "
-        #     "Bid {BID:>5} - Ask {OFFER:>5}".format(
-        #         stock_name=item_update["name"], **item_update["values"]
-        #     )
-        # )
+        except Error as e:
+            print("price: %s - " % item_update, **item_update["values"])
+            print("Error: %s" % e)
+            
+
+
 
 
     def on_account_update(self, balance_update):
@@ -108,6 +103,8 @@ class TickListeners:
 def main():
     logging.basicConfig(level=logging.INFO)
     # logging.basicConfig(level=logging.DEBUG)
+
+    print("Algo main() started")
 
     # create / connect to database
     fx_db = FXdb()
@@ -133,20 +130,7 @@ def main():
     ig_stream_service.connect(accountId)
 
     # Making a new Subscription in MERGE mode
-    # subscription_prices = Subscription(
-    #     mode="MERGE",
-    #     items=["L1:CS.D.GBPUSD.CFD.IP", "L1:CS.D.USDJPY.CFD.IP"],
-    #     fields=["UPDATE_TIME", "BID", "OFFER", "CHANGE", "MARKET_STATE"],
-    # )
-    # adapter="QUOTE_ADAPTER")
 
-    # Adding the "on_price_update" function to Subscription
-    # subscription_prices.addlistener(on_prices_update)
-
-    # Registering the Subscription
-    # sub_key_prices = ig_stream_service.ls_client.subscribe(subscription_prices)
-
-    # Making an other Subscription in MERGE mode
     subscription_account = Subscription(
         mode="MERGE", items=["ACCOUNT:" + accountId], fields=["AVAILABLE_CASH"],
     )

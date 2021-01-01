@@ -4,7 +4,7 @@ services:
   fxDB:
     image: postgres
     volumes:
-      - "/home/pi/GITRepos/DockerData/fxDB:/var/lib/postgresql/data"
+      - "/home/pi/GitRepo/DockerData/fxDB:/var/lib/postgresql/data"
     ports:
       - "5432:5432"
     environment:
@@ -13,17 +13,17 @@ services:
   pgAdmin:
     image: naobana/pgadmin4:latest
     volumes:
-      - "/home/pi/GITRepos/DockerData/pgAdmin:/pgadmin"
+      - "/home/pi/GitRepo/DockerData/pgAdmin:/pgadmin"
     ports:
       - "5050:5050"
     
-  Algo:
-    build: .
-    image: algo
+  FXDataCollector:
+    build: ./FXDataCollector
+    image: sulatnijag/fxdatacollector:latest
     stdin_open: true
     tty: true
     volumes: 
-      - "/home/pi/GITRepos/Algo/FXDataCollector:/usr/src/app/FXDataCollector"
+      - "/home/pi/GitRepo/Algo/FXDataCollector:/usr/src/app/FXDataCollector"
 
 
   
